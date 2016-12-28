@@ -1,27 +1,51 @@
 // Get the packages we need
 var express = require('express');
 var bodyParser = require('body-parser');
-//var mongoose = require('mongoose');
-var mongodb = require("mongodb");
-var ObjectID = mongodb.ObjectID;
+var mongoose = require('mongoose');
+require('dotenv').config()
+var Schema = mongoose.Schema;
 
-var CONTACTS_COLLECTION = "contacts";
+var options = { server: { socketOptions: { keepAlive: 300000, connectTimeoutMS: 30000 } }, 
+                replset: { socketOptions: { keepAlive: 300000, connectTimeoutMS : 30000 } } };
 
-// Create a database variable outside of the database connection callback to reuse the connection pool in your app.
-var db;
+var mongodbURI = process.env.MONGODB_URI;
+console.log(mongodbURI);
 
-// Connect to the database before starting the application server.
-mongodb.MongoClient.connect(process.env.MONGODB_URI, function (err, database) {
-  if (err) {
-    console.log(err);
-    process.exit(1);
-  }
+// Connect to the beerlocker MongoDB
+mongoose.connect(mongodbURI, options);
 
-  // Save database object from the callback for reuse.
-  db = database;
+var conn = mongoose.connection;             
+ 
+conn.on('error', console.error.bind(console, 'connection error:'));  
+ 
+var User = mongoose.model('User', new Schema({
+    name: String,
+    username: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    admin: Boolean,
+    location: String,
+    created_at: Date,
+    updated_at: Date
+}));
 
-  console.log("Database connection ready");
-  console.log("DB: " + process.env.MONGODB_URI);
+
+var new_user = new User({
+    name: 'test2',
+    username: 'test2',
+    password: 'test2'
+});
+
+
+conn.once('open', function() {
+  // Wait for the database connection to establish, then start the app.  
+
+  console.log('started')
+    new_user.save(function(err) {
+        if (err) throw err;
+        console.log('User created!');
+    });
+
+  console.log("connected to the db...");                       
 });
 
 // Create our Express application
