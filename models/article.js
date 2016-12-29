@@ -8,7 +8,11 @@ var ArticleSchema   = new mongoose.Schema({
   publishDate: Date,
   publicationName: String,
   articleUrl: String,
-  imageUrl: String
+  imageUrl: String,
+  createdByUserId: String,
+  dateCreated: Date,
+  lastModifiedByUserId: String,
+  dateLastModified: Date
 });
 
 // Export the Mongoose model

@@ -13,6 +13,10 @@ exports.postArticles = function(req, res) {
   article.publicationName = req.body.publicationName;
   article.articleUrl = req.body.articleUrl;
   article.imageUrl = req.body.imageUrl;
+  article.createdByUserId = req.user._id;
+  article.dateCreated = new Date();
+  article.lastModifiedByUserId =  article.userId = req.user._id;
+  article.dateLastModified = new Date();
 
   // Save the article and check for errors
   article.save(function(err) {
@@ -52,6 +56,11 @@ exports.putArticle = function(req, res) {
     if (err)
       res.send(err);
 
+    if (!article){
+      res.json({message: 'Article not found!'});
+      return;
+    }
+
     // Set the article properties that came from the PUT data
     article.title = req.body.title;
     article.summary = req.body.summary;
@@ -59,6 +68,8 @@ exports.putArticle = function(req, res) {
     article.publicationName = req.body.publicationName;
     article.articleUrl = req.body.articleUrl;
     article.imageUrl = req.body.imageUrl;
+    article.lastModifiedByUserId =  article.userId = req.user._id;
+    article.dateLastModified = new Date();
 
     // Save the article and check for errors
     article.save(function(err) {
@@ -73,10 +84,15 @@ exports.putArticle = function(req, res) {
 // Create endpoint /api/article/:article_id for DELETE
 exports.deleteArticle = function(req, res) {
   // Use the Article model to find a specific article and remove it
-  Article.findByIdAndRemove(req.params.article_id, function(err) {
+  Article.findOneAndRemove({ _id: req.params.article_id, createdByUserId: req.user._id },  function(err, article) {
     if (err)
       res.send(err);
 
-    res.json({ message: 'Article removed from the portfolio!' });
+    //console.log("DELETE. Article: " + article);
+
+    if (article)
+      res.json({ message: 'Article removed from the portfolio!!!' });
+    else
+      res.json({ message: 'Article not found, or user not authorised to delete it from the portfolio!!!' });
   });
 };

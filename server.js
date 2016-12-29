@@ -2,9 +2,12 @@
 var express = require('express');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
+var passport = require('passport');
 
 // load modules required
 var articleController = require('./controllers/article');
+var userController = require('./controllers/user');
+var authController = require('./controllers/auth');
 
 // load environment variables
 require('dotenv').config()
@@ -31,23 +34,32 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
+// Use the passport package in our application
+app.use(passport.initialize());
+
 // Create our Express router
 var router = express.Router();
 
 // Create endpoint handlers for /articles
 router.route('/articles')
-  .post(articleController.postArticles)
-  .get(articleController.getArticles);
+  .post(authController.isAuthenticated, articleController.postArticles)
+  .get(authController.isAuthenticated, articleController.getArticles);
 
 // Create endpoint handlers for /articles/:article_id
 router.route('/articles/:article_id')
-  .get(articleController.getArticle)
-  .put(articleController.putArticle)
-  .delete(articleController.deleteArticle);
+  .get(authController.isAuthenticated, articleController.getArticle)
+  .put(authController.isAuthenticated, articleController.putArticle)
+  .delete(authController.isAuthenticated, articleController.deleteArticle);
+
+// Create endpoint handlers for /users
+router.route('/users')
+	// the post should not require authentication before some users are created.
+	// otherwise, it wouldn't be possible to add any users, which won't allow authentication in the first place
+  .post(authController.isAuthenticated, userController.postUsers)
+  .get(authController.isAuthenticated, userController.getUsers);
 
 // Register all our routes with /api
 app.use('/api', router);
-
 
 // Start the server
 app.listen(port);
