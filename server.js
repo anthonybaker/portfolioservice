@@ -17,7 +17,7 @@ var options = { server: { socketOptions: { keepAlive: 300000, connectTimeoutMS: 
                 replset: { socketOptions: { keepAlive: 300000, connectTimeoutMS : 30000 } } };
 
 var mongodbURI = process.env.MONGODB_URI;
-console.log(mongodbURI);
+//console.log(mongodbURI);
 
 // Connect to the beerlocker MongoDB
 mongoose.connect(mongodbURI, options);
@@ -27,6 +27,9 @@ var app = express();
 
 // Use environment defined port or 3000
 var port = process.env.PORT || 3000;
+
+// tell the app where to serve the public static files for our web app
+app.use(express.static(__dirname + "/public"));
 
 // Use the body-parser package in our application
 app.use(bodyParser.json());
@@ -44,6 +47,7 @@ var router = express.Router();
 router.route('/articles')
   .post(authController.isAuthenticated, articleController.postArticles)
   .get(authController.isAuthenticated, articleController.getArticles);
+  //.get(articleController.getArticles);
 
 // Create endpoint handlers for /articles/:article_id
 router.route('/articles/:article_id')

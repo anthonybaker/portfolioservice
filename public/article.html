@@ -1,0 +1,31 @@
+<div class = "row">
+  <div class="col-md-6">
+    <h2>
+      {{ article.title }}
+    </h2>
+  </div>
+  <div class="col-md-3">
+  </div>
+  <div class="col-md-2">
+    <a href="#/"><button style="margin-top:20px; margin-bottom:20px;" class="btn btn-default" ng-click="deleteArticle(article._id)">Delete</button></a>
+  </div>
+  <div class="col-md-1">
+  </div>
+</div>
+<div ng-hide="editMode" class="container">
+  <div>
+    <p ng-if="article.title">title: {{ article.title }}</p>
+    <p ng-if="article.summary">summary: {{ article.summary }} </p>
+    <p ng-if="article.publishDate">publish date: {{ article.publishDate }} </p>
+    <p ng-if="article.publicationName"> publication name: {{ article.publicationName }} </p>
+    <p ng-if="article.articleUrl">article url: <a ng-href="{{ article.articleUrl }}" target="_blank">{{ article.articleUrl }}</a></p>
+    <p ng-if="article.imageUrl">image url: <a ng-href="{{ article.imageUrl }}" target="_blank">{{ article.imageUrl }}</a></p>
+    <p>
+      <button style="margin-top:20px" class="btn btn-default" ng-click="toggleEdit()">Edit</button>
+      <a style="margin-top:20px" class="btn btn-default" href="#/">Back</a>
+    </p>
+  </div>
+</div>
+<!-- Contact form -->
+<div ng-include="articleFormUrl">
+</div>
