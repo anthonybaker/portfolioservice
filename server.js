@@ -8,6 +8,7 @@ var passport = require('passport');
 var articleController = require('./controllers/article');
 var userController = require('./controllers/user');
 var authController = require('./controllers/auth');
+var apiAIController = require('./controllers/apiai');
 
 // load environment variables
 require('dotenv').config()
@@ -61,6 +62,10 @@ router.route('/users')
 	// otherwise, it wouldn't be possible to add any users, which won't allow authentication in the first place
   .post(authController.isAuthenticated, userController.postUsers)
   .get(authController.isAuthenticated, userController.getUsers);
+
+// Create endpoint handlers for /apiai
+router.route('/apiai')
+  .post(authController.isAuthenticated, apiAIController.postRequest);
 
 // Register all our routes with /api
 app.use('/api', router);
